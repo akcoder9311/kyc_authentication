@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import Kyc from './component/Kyc'
 
 import './App.css'
