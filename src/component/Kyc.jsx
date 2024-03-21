@@ -10,7 +10,11 @@ function Kyc() {
        const [userData,setUserData] = useState({firstName:'',
                                                 lastName:'',
                                                 email:'',
-                                                idDocument:null});
+                                                streetAddress: '',
+                                                postalCode:'',
+                                                city:'',
+                                                country:'',
+                                                });
 
 
 
@@ -23,41 +27,35 @@ function Kyc() {
        };
 
 
-       const handleFileChange = (e) => {
-        const  file = e.target.files[0];
-        setUserData((prevData)=>({
-          ...prevData,
-          idDocument:file,
-        }));
-       } ;
+       
     
 
      const handleSubmit = async (e) => {
         e.preventDefault();
         
-
-        try {
-          
-          const jwt = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySW5mb3JtYXRpb24iOnsiaWQiOiJkZmMxOTdlOC1kNjBjLTQxNzItYTg5ZS1kZTUzYmU1YWFhMjAiLCJlbWFpbCI6ImFheWFua2hhbjg4MTBAZ21haWwuY29tIiwiZW1haWxfdmVyaWZpZWQiOnRydWUsInBpbl9wb2xpY3kiOnsicmVnaW9ucyI6W3siaWQiOiJGUkExIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9LHsiaWQiOiJOWUMxIiwiZGVzaXJlZFJlcGxpY2F0aW9uQ291bnQiOjF9XSwidmVyc2lvbiI6MX0sIm1mYV9lbmFibGVkIjpmYWxzZSwic3RhdHVzIjoiQUNUSVZFIn0sImF1dGhlbnRpY2F0aW9uVHlwZSI6InNjb3BlZEtleSIsInNjb3BlZEtleUtleSI6ImVmOTdjNmNiMjdjZjgxMTFjYjQ2Iiwic2NvcGVkS2V5U2VjcmV0IjoiYTFjOTdhODk2N2I5YjQ4YzQ2NzgzZDEzYjhjOWE4OWM1ZTY4NjBjMmQ0NTJlMmNhZGY0ZmYxYjI0YTYwYzEwYiIsImlhdCI6MTcxMDgzMzk2OX0.XMhqEQdoBohA9wiEJWalYXLvoGSipbe-nKs1gDiM1gI";
-
-
-
-          const formData = new FormData();
+        console.log("after event ");
+        const formData = new FormData();
           formData.append("firstName",userData.firstName);
           formData.append("lastName",userData.lastName);
           formData.append("email",userData.email);
-          formData.append("idDocument",userData.idDocument);
+          formData.append("streetAddress",userData.streetAddress);
+          formData.append("postalCode",userData.postalCode);
+          formData.append("city",userData.city);
+          formData.append("country",userData.country);
+          
 
 
-
-          const responce  = await axios.post('https://api.pinata.cloud/pinning/pinFileToIPFS',formData,
-          {
-            headers:{
-             
-              'Content-Type': 'multipart/form-data',
-              'Authorization': `Bearer ${jwt}`,
+        try {
+             console.log("after try  ");
+           const response  = await axios({method:"post",url:import.meta.env.VITE_PINATA_URL, data: formData ,
+              headers: {
+                    Authorization: `Bearer ${import.meta.env.VITE_PINATA_JWT}`,
+                   'Content-Type': 'application/json',
+                   
             },
           });
+          console.log("responce ");
+          return response
          } catch (error) {
           console.error(error);
           throw error;
@@ -69,54 +67,109 @@ function Kyc() {
     return (
     <>
       <h2>KYC Form</h2>
-      <form className="p-4 m-4">
-        <label>
+      <form className="p-4 m-4" 
+            action="/submit-form" 
+            method="POST" 
+            encType="multipart/form-data">
+        
+         <label for="firstName">
           First Name:
-          <input  className="p-4 m-4"
+          <input  className="p-1 m-1"
             type="text"
             name="firstName"
+            placeholder="firstName"
             value={userData.firstName}
             onChange={handleInputChange}
             required
           />
         </label>
+        
         <br />
-        <label>
+
+        <label for="lastName">
           Last Name:
-          <input  className="p-4 m-4"
+          <input  className="p-1 m-1"
             type="text"
             name="lastName"
+            placeholder="lastName"
             value={userData.lastName}
             onChange={handleInputChange}
             required
           />
         </label>
+
         <br />
-        <label>
+
+        <label for="email">
           Email:
-          <input className="p-p-4 m-4"
+          <input className="p-1 m-1"
             type="email"
             name="email"
+            placeholder="email"
             value={userData.email}
             onChange={handleInputChange}
             required
           />
         </label>
         <br />
-        <label>
-          ID Document:
-          <input className="p-4 m-4"
-            type="file"
-            accept="image/png,image/jpeg"
-            name="idDocument"
-            onChange={handleFileChange}
+
+        <label for="streetAddress">
+          Street address 
+          <input className="p-1 m-1"
+            type="text"
+            name="streetAddress"
+            placeholder="Enter your Street Address"
+            value={userData.streetAddress}
+            onChange={handleInputChange}
+            required
+          />
+        </label>
+
+        <br />
+
+        <label for="postalCode">
+          ZIP or Postal code (optional):
+          <input className="p-1 m-1"
+            type="text"
+            name="postalCode"
+            placeholder="Enter your ZIP or postal code "
+            value={userData.postalCode}
+            onChange={handleInputChange}
+          />
+        </label>
+
+         <br />
+
+        <label for="city">
+          City:
+          <input className="p-1 m-1"
+            type="text"
+            name="city"
+            placeholder="Enter your city "
+            value={userData.city}
+            onChange={handleInputChange}
             required
           />
         </label>
         <br />
+
+        <label for="Country">
+          Country:
+          <input className="p-1 m-1"
+            type="text"
+            name="country"
+            placeholder="Enter your country name "
+            value={userData.country}
+            onChange={handleInputChange}
+            required
+          />
+        </label>
+        <br />
+
         <button className="bg-sky-500/100 text-white rounded border-black" 
                  type="submit"
                  onClick={handleSubmit}>Submit</button>
+          
       </form>
     </>
  );
